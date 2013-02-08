@@ -1,0 +1,22 @@
+package com.recurly.v2;
+
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+
+@XmlRootElement(name="subscription_add_ons")
+public class SubscriptionAddOns {
+ 
+
+@XmlElement(name="add_on_code")
+public String IpAddress;
+
+@XmlElement(name="quantity")
+public Integer quantity;
+
+
+@XmlElement(name="unit_amount_in_cents")
+public Integer unit_amount_in_cents;
+
+
+
+}
