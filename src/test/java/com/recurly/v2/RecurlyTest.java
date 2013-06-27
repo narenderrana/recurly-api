@@ -1,6 +1,8 @@
 package com.recurly.v2;
 
 import org.junit.Test;
+
+import com.recurly.v2.utils.RecurlyUtils;
  
 
 public class RecurlyTest {

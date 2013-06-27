@@ -9,18 +9,7 @@
   <dependencies>
   
   <!-- recurly api dependency -->
-  <dependency>
-	<groupId>commons-codec</groupId>
-	<artifactId>commons-codec</artifactId>
-	<version>1.2</version>
-		</dependency>
-  <dependency>
-        <groupId>org.slf4j</groupId>
-        <artifactId>slf4j-api</artifactId>
-        <version>1.5.6</version>
-    </dependency>
  
-    
       <dependency>
 	<groupId>junit</groupId>
 	<artifactId>junit</artifactId>
@@ -28,10 +17,18 @@
    </dependency>
    
      <!-- Stripe api dependency -->
+   <!-- Log4j -->
+	<dependency>
+	    <groupId>log4j</groupId>
+	    <artifactId>log4j</artifactId>
+	    <version>1.2.9</version>
+	</dependency>
+   
    <dependency>
-  <groupId>com.stripe</groupId>
-  <artifactId>stripe-java</artifactId>
-  <version>1.1.14</version>
+  <groupId>org.testng</groupId>
+  <artifactId>testng</artifactId>
+  <version>6.1.1</version>
+  <scope>test</scope>
 </dependency>
    
   </dependencies>

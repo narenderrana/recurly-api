@@ -8,6 +8,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name="account")
 public class Account  {
 	public static String pluralResourceName = "accounts";
+	public enum AccountState{
+		active,closed,past_due
+	};
 
 	//Required
     @XmlElement(name="account_code")

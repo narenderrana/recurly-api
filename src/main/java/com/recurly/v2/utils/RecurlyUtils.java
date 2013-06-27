@@ -1,4 +1,4 @@
-package com.recurly.v2;
+package com.recurly.v2.utils;
 
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -8,8 +8,18 @@ import java.util.Properties;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 
+import com.recurly.v2.Account;
+import com.recurly.v2.BillingInfo;
+import com.recurly.v2.Subscription;
+import com.recurly.v2.Subscriptions;
+import com.recurly.v2.Transaction;
+import com.recurly.v2.Transactions;
+import com.recurly.v2.URLBase;
+import com.recurly.v2.URLUtils;
+
 
  
+
 
 
 public class RecurlyUtils extends URLBase {
@@ -17,17 +27,15 @@ public class RecurlyUtils extends URLBase {
 	// private static final Logger logger = LoggerFactory.getLogger(RecurlyUtils.class);
 
 	
- public  static Subscriptions getSubscriptions(String accountCode){
+ public  static Response getSubscriptions(String accountCode){
 	 
 	 
 	 try{
 
-			StringBuffer buffer=URLUtils.doGet(LIST_SUBSCRIPTIONS_account_code.replace(":account_code", accountCode), null, REQUEST_HEADERS);
-			JAXBContext context = JAXBContext.newInstance(Subscriptions.class);
-			context.createUnmarshaller();
-			javax.xml.bind.Unmarshaller unmarshaller = context.createUnmarshaller();
-			Subscriptions subscriptions =  (com.recurly.v2.Subscriptions) unmarshaller.unmarshal(new StringReader(buffer.toString()));
-		    return subscriptions;
+			  Response response=URLUtils.doGet(LIST_SUBSCRIPTIONS_account_code.replace(":account_code", accountCode), null, REQUEST_HEADERS);
+			  response.setType(Subscriptions.class);
+		 
+		    return response;
 		}catch(Exception e2){
 			e2.printStackTrace();
 		
@@ -55,19 +63,9 @@ public  static Object addSubscription(String  plan_code,String currency,String a
 	 		"</subscription>");
 	
 	 try{
-		 StringBuffer buffer=URLUtils.doPost(CREATE_SUBSCRIPTION, null, REQUEST_HEADERS, requestXML);
-		 
-		 if(buffer.toString().contains("<errors>")){return errors(buffer);}
-		 else if(buffer.toString().contains("<error>")){return error(buffer);}
-		 else{
-			 
-			    JAXBContext context = JAXBContext.newInstance(Subscription.class);
-				context.createUnmarshaller();
-				javax.xml.bind.Unmarshaller unmarshaller = context.createUnmarshaller();
-				Subscription addedsubscription =  (Subscription) unmarshaller.unmarshal(new StringReader(buffer.toString()));
-				return addedsubscription;
-		 }
-			 
+		  Response response=URLUtils.doPost(CREATE_SUBSCRIPTION, null, REQUEST_HEADERS, requestXML);
+		  response.setType(Subscription.class);
+		 return response;
 		    
 		}catch(Exception e2){
 			e2.printStackTrace();
@@ -94,17 +92,10 @@ public  static Object createSubscription(String  plan_code,String currency,Strin
 	 		"</account>"+
 	 		"</subscription>");
 	 try{
-			StringBuffer buffer=URLUtils.doPost(CREATE_SUBSCRIPTION, null, REQUEST_HEADERS, requestXML);
+		 Response response=URLUtils.doPost(CREATE_SUBSCRIPTION, null, REQUEST_HEADERS, requestXML);
+		 response.setType(Subscription.class);
 			
-			
-			 if(buffer.toString().contains("<errors>")){return errors(buffer);}
-			 else if(buffer.toString().contains("<error>")){return error(buffer);}
-			 else{
-			JAXBContext context = JAXBContext.newInstance(Subscription.class);
-			context.createUnmarshaller();
-			javax.xml.bind.Unmarshaller unmarshaller = context.createUnmarshaller();
-			Subscription addedsubscription =  (Subscription) unmarshaller.unmarshal(new StringReader(buffer.toString()));
-		    return addedsubscription;}
+			  return response;
 		}catch(Exception e2){
 			e2.printStackTrace();
 		
@@ -112,11 +103,13 @@ public  static Object createSubscription(String  plan_code,String currency,Strin
 	 return null;
  }
  
-public static Object  cancelSubscription(String accountCode,String plan_code){
+public static Response  cancelSubscription(String accountCode,String plan_code){
 	 
 	 
 	 try{
-		 Subscriptions subscriptions= getSubscriptions(accountCode);
+		 Response<Subscriptions> subscriptionsResponse=getSubscriptions(accountCode);
+		 Subscriptions subscriptions= subscriptionsResponse.getResponseObject();
+		 
 		 List<Subscription> subscriptionList=subscriptions.subscriptions;
 		 String uuid=null;
 		 if(subscriptionList!=null){
@@ -130,22 +123,14 @@ public static Object  cancelSubscription(String accountCode,String plan_code){
 		 
 	  if(uuid!=null){
 		  
-		    StringBuffer buffer=URLUtils.doPut(CANCEL_SUBSCRIPTION_uuid.replace(":uuid", uuid),null,REQUEST_HEADERS,"");
-		 if(buffer.toString().contains("<errors>")){return errors(buffer);}
-		 else if(buffer.toString().contains("<error>")){return error(buffer);}
-		 else{
-			 
-			    JAXBContext context = JAXBContext.newInstance(Subscription.class);
-				context.createUnmarshaller();
-				javax.xml.bind.Unmarshaller unmarshaller = context.createUnmarshaller();
-				Subscription addedsubscription =  (Subscription) unmarshaller.unmarshal(new StringReader(buffer.toString()));
-				return addedsubscription;
-		 }
+		    Response addedsubscriptionResponse=URLUtils.doPut(CANCEL_SUBSCRIPTION_uuid.replace(":uuid", uuid),null,REQUEST_HEADERS,"");
+		    addedsubscriptionResponse.setType( Subscription.class );
+		    return addedsubscriptionResponse;
 		  
 	  }
 		   
 			
-		    return subscriptions;
+		    return subscriptionsResponse;
 		}catch(Exception e2){
 			e2.printStackTrace();
 		
@@ -447,36 +432,7 @@ public static Object  clearBillingInformation(String accountCode){
 	 return null;
 }
 
-private static Errors errors(StringBuffer errorBuff) throws JAXBException{
-	
-	    
-	    JAXBContext context = JAXBContext.newInstance(Errors.class);
-		context.createUnmarshaller();
-		javax.xml.bind.Unmarshaller unmarshaller = context.createUnmarshaller();
-	 
-	    Errors error =  (Errors) unmarshaller.unmarshal(new StringReader(errorBuff.toString()));
-	    
-	    try{
-	    	JAXBContext attributecontext= JAXBContext.newInstance(com.recurly.v2.Messages.class);
-	    	attributecontext.createUnmarshaller();
-			javax.xml.bind.Unmarshaller attributeMarshller = attributecontext.createUnmarshaller();
-			com.recurly.v2.Messages messages=  (com.recurly.v2.Messages) attributeMarshller.unmarshal(new StringReader(errorBuff.toString()));
-			error.errorMessage=messages.errorMessage;
-	    }catch(Exception e){e.printStackTrace();}
-	    
-	    return error;
-}
-private static Error error(StringBuffer errorBuff) throws JAXBException{
-	
-    System.out.println(errorBuff);
-    JAXBContext context = JAXBContext.newInstance(Error.class);
-	context.createUnmarshaller();
-	javax.xml.bind.Unmarshaller unmarshaller = context.createUnmarshaller();
- 
-    Error error =  (Error) unmarshaller.unmarshal(new StringReader(errorBuff.toString()));
-    
-    return error;
-}
+
 
 public  static Transaction getTransaction(String transactionId){
 	 

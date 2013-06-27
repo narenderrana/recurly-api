@@ -18,6 +18,7 @@ public static String TERMINATE_SUBSCRIPTION_uuid=BASEURL+"subscriptions/:uuid/te
 public static String UPDATE_BILLING_INFO_account_code=BASEURL+"accounts/:account_code/billing_info";
 public static String CLEAR_BILLING_INFO_account_code=BASEURL+"accounts/:account_code/billing_info";
 
+public static String LIST_ACCOUNT=BASEURL+"accounts";
 public static String CREATE_ACCOUNT=BASEURL+"accounts";
 public static String GET_ACCOUNT_account_code=BASEURL+"/accounts/:account_code";
 
